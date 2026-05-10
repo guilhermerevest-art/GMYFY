@@ -1,32 +1,48 @@
-import { create } from 'zustand';
+﻿import { create } from 'zustand';
+
+const SUPABASE_URL = process.env['EXPO_PUBLIC_SUPABASE_URL'] ?? 'https://baqxljihngymjnasrdtl.supabase.co';
+
+interface Session {
+  userId: string;
+  academiaId: string;
+  nome: string;
+  email: string;
+}
 
 interface AuthState {
-  token: string | null;
-  usuario: { id: string; email: string; tipo: string } | null;
-  academiaId: string | null;
-  setToken: (token: string) => void;
+  session: Session | null;
+  setSession: (session: Session) => void;
   logout: () => void;
 }
 
-function parseJwt(token: string) {
-  try {
-    return JSON.parse(atob(token.split('.')[1]!));
-  } catch {
-    return null;
+export const useAuthStore = create<AuthState>((set) => ({
+  session: null,
+  setSession: (session) => set({ session }),
+  logout: () => set({ session: null }),
+}));
+
+export async function loginWithEdgeFunction(email: string, senha: string): Promise<Session> {
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/auth-login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, senha }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: 'Erro ao fazer login' }));
+    throw new Error(err.message ?? 'Erro ao fazer login');
   }
+  return res.json();
 }
 
-export const useAuthStore = create<AuthState>((set) => ({
-  token: null,
-  usuario: null,
-  academiaId: null,
-  setToken: (token) => {
-    const payload = parseJwt(token);
-    set({
-      token,
-      academiaId: payload?.academiaId ?? null,
-      usuario: payload ? { id: payload.sub, email: payload.email, tipo: payload.tipo } : null,
-    });
-  },
-  logout: () => set({ token: null, usuario: null, academiaId: null }),
-}));
+export async function registerWithEdgeFunction(nome: string, email: string, senha: string): Promise<Session> {
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/auth-register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ nome, email, senha }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ message: 'Erro ao cadastrar' }));
+    throw new Error(err.message ?? 'Erro ao cadastrar');
+  }
+  return res.json();
+}

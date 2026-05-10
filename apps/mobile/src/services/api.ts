@@ -1,58 +1,156 @@
-const API_URL = process.env['EXPO_PUBLIC_API_URL'] ?? 'http://localhost:3001';
+﻿import { supabase } from './supabase';
 
-async function request<T>(path: string, options?: RequestInit, token?: string): Promise<T> {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-  const res = await fetch(`${API_URL}${path}`, { ...options, headers });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({ message: 'Erro' }));
-    throw new Error((err as any).message ?? 'Erro na requisição');
-  }
-  return res.json() as Promise<T>;
-}
+const SUPABASE_URL = process.env['EXPO_PUBLIC_SUPABASE_URL'] ?? 'https://baqxljihngymjnasrdtl.supabase.co';
 
 export const api = {
-  auth: {
-    login: (email: string, senha: string, token?: string) =>
-      request<{ access_token: string }>('/auth/login', { method: 'POST', body: JSON.stringify({ email, senha }) }, token),
-    register: (data: object) =>
-      request<{ access_token: string }>('/auth/register', { method: 'POST', body: JSON.stringify(data) }),
-  },
   checkins: {
-    validar: (qrToken: string, token: string) =>
-      request<any>('/checkins', { method: 'POST', body: JSON.stringify({ qrToken }) }, token),
-    historico: (token: string) => request<any[]>('/checkins', {}, token),
+    validar: async (qrToken: string, userId: string, academiaId: string) => {
+      const res = await fetch(`${SUPABASE_URL}/functions/v1/checkin-validar`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ qrToken, userId, academiaId }),
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ message: 'Erro no check-in' }));
+        throw new Error(err.message ?? 'Erro no check-in');
+      }
+      return res.json();
+    },
+    historico: async (userId: string) => {
+      const { data } = await supabase
+        .from('gymfy_check_ins')
+        .select('id, pontos_ganhos, criado_em')
+        .eq('aluno_id', userId)
+        .order('criado_em', { ascending: false })
+        .limit(30);
+      return data ?? [];
+    },
   },
+
   ranking: {
-    get: (token: string, periodo?: string) =>
-      request<any[]>(`/ranking${periodo ? `?periodo=${periodo}` : ''}`, {}, token),
-    minha: (token: string) => request<any>('/ranking/me', {}, token),
+    get: async (academiaId: string) => {
+      const inicio = new Date();
+      inicio.setDate(1);
+      inicio.setHours(0, 0, 0, 0);
+
+      const { data } = await supabase
+        .from('gymfy_pontos')
+        .select('aluno_id, quantidade, gymfy_usuarios!inner(nome)')
+        .eq('academia_id', academiaId)
+        .gte('criado_em', inicio.toISOString());
+
+      const totais: Record<string, { nome: string; pontos: number }> = {};
+      for (const row of data ?? []) {
+        const id = row.aluno_id;
+        const nome = (row.gymfy_usuarios as any)?.nome ?? 'Aluno';
+        totais[id] = { nome, pontos: (totais[id]?.pontos ?? 0) + row.quantidade };
+      }
+
+      return Object.entries(totais)
+        .sort((a, b) => b[1].pontos - a[1].pontos)
+        .map(([alunoId, v], idx) => ({ alunoId, posicao: idx + 1, pontos: v.pontos, aluno: { nome: v.nome } }));
+    },
+
+    minha: async (academiaId: string, userId: string) => {
+      const ranking = await api.ranking.get(academiaId);
+      const entry = ranking.find((r) => r.alunoId === userId);
+      return entry ?? { posicao: null, pontos: 0 };
+    },
   },
+
   alunos: {
-    perfil: (token: string) => request<any>('/alunos/me/perfil', {}, token),
-    historico: (token: string) => request<any[]>('/alunos/me/historico', {}, token),
+    perfil: async (userId: string) => {
+      const [{ data: usuario }, { count: totalCheckins }, { data: pontosData }, { data: conquistas }] =
+        await Promise.all([
+          supabase.from('gymfy_usuarios').select('id, nome, email').eq('id', userId).single(),
+          supabase.from('gymfy_check_ins').select('*', { count: 'exact', head: true }).eq('aluno_id', userId),
+          supabase.from('gymfy_pontos').select('quantidade').eq('aluno_id', userId),
+          supabase.from('gymfy_conquistas_aluno').select('id, gymfy_conquistas(nome, descricao, icone)').eq('aluno_id', userId),
+        ]);
+
+      const totalPontos = (pontosData ?? []).reduce((acc, p) => acc + p.quantidade, 0);
+      return {
+        ...usuario,
+        totalCheckins: totalCheckins ?? 0,
+        totalPontos,
+        conquistas: (conquistas ?? []).map((c) => ({ id: c.id, conquista: c.gymfy_conquistas })),
+      };
+    },
   },
+
   desafios: {
-    ativos: (token: string) => request<any[]>('/desafios/ativos', {}, token),
-    participar: (id: string, token: string) =>
-      request<any>(`/desafios/${id}/participar`, { method: 'POST' }, token),
+    ativos: async (academiaId: string) => {
+      const { data } = await supabase
+        .from('gymfy_desafios')
+        .select('*, gymfy_desafio_participantes(count)')
+        .eq('academia_id', academiaId)
+        .eq('status', 'ATIVO')
+        .order('criado_em', { ascending: false });
+      return (data ?? []).map((d) => ({
+        ...d,
+        metaCheckins: d.meta_checkins,
+        _count: { participantes: d.gymfy_desafio_participantes?.[0]?.count ?? 0 },
+      }));
+    },
+
+    participar: async (desafioId: string, userId: string) => {
+      const { error } = await supabase
+        .from('gymfy_desafio_participantes')
+        .insert({ desafio_id: desafioId, aluno_id: userId });
+      if (error) throw new Error(error.message);
+    },
   },
+
   premios: {
-    vitrine: (token: string) => request<any[]>('/premios', {}, token),
-    resgatar: (id: string, token: string) =>
-      request<any>(`/premios/${id}/resgatar`, { method: 'POST' }, token),
+    vitrine: async (academiaId: string) => {
+      const { data } = await supabase
+        .from('gymfy_premios')
+        .select('*')
+        .eq('academia_id', academiaId)
+        .eq('ativo', true)
+        .order('criado_em', { ascending: false });
+      return (data ?? []).map((p) => ({ ...p, pontosNecessarios: p.pontos_necessarios }));
+    },
+
+    resgatar: async (premioId: string, userId: string) => {
+      const { error } = await supabase
+        .from('gymfy_resgates')
+        .insert({ premio_id: premioId, aluno_id: userId });
+      if (error) throw new Error(error.message);
+    },
   },
+
   feed: {
-    get: (token: string, cursor?: string) =>
-      request<any>(`/feed${cursor ? `?cursor=${cursor}` : ''}`, {}, token),
-    reagir: (postId: string, tipo: string, token: string) =>
-      request<any>(`/feed/${postId}/reacoes`, { method: 'POST', body: JSON.stringify({ tipo }) }, token),
+    get: async (academiaId: string) => {
+      const { data } = await supabase
+        .from('gymfy_feed_posts')
+        .select('id, conteudo, criado_em, gymfy_usuarios!inner(nome), gymfy_feed_reacoes(count)')
+        .eq('academia_id', academiaId)
+        .order('criado_em', { ascending: false })
+        .limit(30);
+      return (data ?? []).map((p) => ({
+        id: p.id,
+        conteudo: p.conteudo,
+        criadoEm: p.criado_em,
+        autor: p.gymfy_usuarios,
+        _count: { reacoes: p.gymfy_feed_reacoes?.[0]?.count ?? 0 },
+      }));
+    },
   },
+
   notificacoes: {
-    get: (token: string) => request<any[]>('/notificacoes', {}, token),
-    marcarLida: (id: string, token: string) =>
-      request<any>(`/notificacoes/${id}/lida`, { method: 'PATCH' }, token),
+    get: async (userId: string) => {
+      const { data } = await supabase
+        .from('gymfy_notificacoes')
+        .select('*')
+        .eq('usuario_id', userId)
+        .order('criado_em', { ascending: false })
+        .limit(20);
+      return data ?? [];
+    },
+
+    marcarLida: async (id: string) => {
+      await supabase.from('gymfy_notificacoes').update({ lida: true }).eq('id', id);
+    },
   },
 };

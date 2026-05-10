@@ -1,27 +1,26 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { api } from '../services/api';
-import { useAuthStore } from '../store/auth.store';
+import { api } from '../../services/api';
+import { useAuthStore } from '../../store/auth.store';
 
 export default function PerfilScreen() {
-  const token = useAuthStore((s) => s.token);
-  const usuario = useAuthStore((s) => s.usuario);
+  const session = useAuthStore((s) => s.session);
   const logout = useAuthStore((s) => s.logout);
   const [perfil, setPerfil] = useState<any>(null);
 
   useEffect(() => {
-    if (!token) return;
-    api.alunos.perfil(token).then(setPerfil).catch(() => {});
-  }, [token]);
+    if (!session?.userId) return;
+    api.alunos.perfil(session.userId).then(setPerfil).catch(() => {});
+  }, [session]);
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.avatar}>
-          <Text style={styles.avatarText}>{usuario?.email?.[0]?.toUpperCase() ?? '?'}</Text>
+          <Text style={styles.avatarText}>{session?.nome?.[0]?.toUpperCase() ?? '?'}</Text>
         </View>
-        <Text style={styles.nome}>{perfil?.nome ?? usuario?.email}</Text>
-        <Text style={styles.email}>{usuario?.email}</Text>
+        <Text style={styles.nome}>{perfil?.nome ?? session?.nome}</Text>
+        <Text style={styles.email}>{session?.email}</Text>
       </View>
 
       <View style={styles.statsRow}>

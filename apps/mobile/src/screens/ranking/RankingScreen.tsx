@@ -1,25 +1,25 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, RefreshControl } from 'react-native';
-import { api } from '../services/api';
-import { useAuthStore } from '../store/auth.store';
+import { api } from '../../services/api';
+import { useAuthStore } from '../../store/auth.store';
 
 export default function RankingScreen() {
-  const token = useAuthStore((s) => s.token);
-  const usuario = useAuthStore((s) => s.usuario);
+  const session = useAuthStore((s) => s.session);
   const [ranking, setRanking] = useState<any[]>([]);
   const [minhaPosicao, setMinhaPosicao] = useState<any>(null);
   const [refreshing, setRefreshing] = useState(false);
 
   async function loadRanking() {
-    if (!token) return;
+    if (!session?.academiaId || !session?.userId) return;
     try {
-      const [r, p] = await Promise.all([api.ranking.get(token), api.ranking.minha(token)]);
+      const r = await api.ranking.get(session.academiaId);
       setRanking(r);
-      setMinhaPosicao(p);
+      const me = r.find((item) => item.alunoId === session.userId);
+      setMinhaPosicao(me ?? { posicao: null, pontos: 0 });
     } catch {}
   }
 
-  useEffect(() => { loadRanking(); }, [token]);
+  useEffect(() => { loadRanking(); }, [session]);
 
   async function onRefresh() {
     setRefreshing(true);
@@ -44,7 +44,7 @@ export default function RankingScreen() {
         keyExtractor={(item) => item.alunoId}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#16a34a" />}
         renderItem={({ item }) => {
-          const isMe = item.alunoId === usuario?.id;
+          const isMe = item.alunoId === session?.userId;
           return (
             <View style={[styles.row, isMe && styles.rowMe]}>
               <View style={styles.posicaoContainer}>

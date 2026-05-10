@@ -1,22 +1,20 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { api } from '../services/api';
-import { useAuthStore } from '../store/auth.store';
+import { useAuthStore, registerWithEdgeFunction } from '../../store/auth.store';
 
 export default function RegisterScreen({ navigation }: any) {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
-  const setToken = useAuthStore((s) => s.setToken);
+  const setSession = useAuthStore((s) => s.setSession);
 
   async function handleRegister() {
     if (!nome || !email || !senha) return;
     setLoading(true);
     try {
-      const res = await api.auth.register({ nome, email, senha, tipo: 'ALUNO' });
-      setToken(res.access_token);
-      navigation.replace('Main');
+      const session = await registerWithEdgeFunction(nome, email, senha);
+      setSession(session);
     } catch (err: any) {
       Alert.alert('Erro', err.message ?? 'Erro ao cadastrar');
     } finally {

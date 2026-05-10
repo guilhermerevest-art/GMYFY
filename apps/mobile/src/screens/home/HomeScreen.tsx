@@ -1,22 +1,22 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, RefreshControl } from 'react-native';
-import { api } from '../services/api';
-import { useAuthStore } from '../store/auth.store';
+import { api } from '../../services/api';
+import { useAuthStore } from '../../store/auth.store';
 
 export default function HomeScreen() {
-  const token = useAuthStore((s) => s.token);
+  const session = useAuthStore((s) => s.session);
   const [feed, setFeed] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
   async function loadFeed() {
-    if (!token) return;
+    if (!session?.academiaId) return;
     try {
-      const res = await api.feed.get(token);
-      setFeed(res.items ?? []);
+      const items = await api.feed.get(session.academiaId);
+      setFeed(items);
     } catch {}
   }
 
-  useEffect(() => { loadFeed(); }, [token]);
+  useEffect(() => { loadFeed(); }, [session]);
 
   async function onRefresh() {
     setRefreshing(true);
@@ -34,7 +34,7 @@ export default function HomeScreen() {
         renderItem={({ item }) => (
           <View style={styles.card}>
             <View style={styles.cardHeader}>
-              <Text style={styles.nome}>{item.autor?.nome ?? 'Aluno'}</Text>
+              <Text style={styles.nome}>{(item.autor as any)?.nome ?? 'Aluno'}</Text>
               <Text style={styles.data}>{new Date(item.criadoEm).toLocaleDateString('pt-BR')}</Text>
             </View>
             {item.conteudo && <Text style={styles.conteudo}>{item.conteudo}</Text>}

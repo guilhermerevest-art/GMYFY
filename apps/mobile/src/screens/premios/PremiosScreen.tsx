@@ -1,27 +1,27 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Alert, RefreshControl } from 'react-native';
-import { api } from '../services/api';
-import { useAuthStore } from '../store/auth.store';
+import { api } from '../../services/api';
+import { useAuthStore } from '../../store/auth.store';
 
 export default function PremiosScreen() {
-  const token = useAuthStore((s) => s.token);
+  const session = useAuthStore((s) => s.session);
   const [premios, setPremios] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
   async function load() {
-    if (!token) return;
+    if (!session?.academiaId) return;
     try {
-      const res = await api.premios.vitrine(token);
+      const res = await api.premios.vitrine(session.academiaId);
       setPremios(res);
     } catch {}
   }
 
-  useEffect(() => { load(); }, [token]);
+  useEffect(() => { load(); }, [session]);
 
   async function resgatar(id: string, nome: string) {
-    if (!token) return;
+    if (!session?.userId) return;
     try {
-      await api.premios.resgatar(id, token);
+      await api.premios.resgatar(id, session.userId);
       Alert.alert('Resgate solicitado!', `Seu resgate de "${nome}" foi enviado para aprovação.`);
     } catch (err: any) {
       Alert.alert('Erro', err.message ?? 'Não foi possível resgatar');

@@ -1,26 +1,26 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
-import { api } from '../services/api';
-import { useAuthStore } from '../store/auth.store';
+import { api } from '../../services/api';
+import { useAuthStore } from '../../store/auth.store';
 
 export default function DesafiosScreen() {
-  const token = useAuthStore((s) => s.token);
+  const session = useAuthStore((s) => s.session);
   const [desafios, setDesafios] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
 
   async function load() {
-    if (!token) return;
+    if (!session?.academiaId) return;
     try {
-      const res = await api.desafios.ativos(token);
+      const res = await api.desafios.ativos(session.academiaId);
       setDesafios(res);
     } catch {}
   }
 
-  useEffect(() => { load(); }, [token]);
+  useEffect(() => { load(); }, [session]);
 
   async function participar(id: string) {
-    if (!token) return;
-    await api.desafios.participar(id, token);
+    if (!session?.userId) return;
+    await api.desafios.participar(id, session.userId);
     load();
   }
 

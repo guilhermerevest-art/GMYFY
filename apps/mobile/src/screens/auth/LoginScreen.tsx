@@ -1,21 +1,19 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
-import { api } from '../services/api';
-import { useAuthStore } from '../store/auth.store';
+import { useAuthStore, loginWithEdgeFunction } from '../../store/auth.store';
 
 export default function LoginScreen({ navigation }: any) {
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [loading, setLoading] = useState(false);
-  const setToken = useAuthStore((s) => s.setToken);
+  const setSession = useAuthStore((s) => s.setSession);
 
   async function handleLogin() {
     if (!email || !senha) return;
     setLoading(true);
     try {
-      const res = await api.auth.login(email, senha);
-      setToken(res.access_token);
-      navigation.replace('Main');
+      const session = await loginWithEdgeFunction(email, senha);
+      setSession(session);
     } catch (err: any) {
       Alert.alert('Erro', err.message ?? 'Erro ao fazer login');
     } finally {
@@ -28,21 +26,8 @@ export default function LoginScreen({ navigation }: any) {
       <Text style={styles.title}>Gymfy</Text>
       <Text style={styles.subtitle}>Entre na sua conta</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="E-mail"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Senha"
-        secureTextEntry
-        value={senha}
-        onChangeText={setSenha}
-      />
+      <TextInput style={styles.input} placeholder="E-mail" keyboardType="email-address" autoCapitalize="none" value={email} onChangeText={setEmail} />
+      <TextInput style={styles.input} placeholder="Senha" secureTextEntry value={senha} onChangeText={setSenha} />
 
       <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
         <Text style={styles.buttonText}>{loading ? 'Entrando...' : 'Entrar'}</Text>

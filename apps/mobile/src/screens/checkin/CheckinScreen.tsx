@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { View, Text, StyleSheet, Alert, TouchableOpacity } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
-import { api } from '../services/api';
-import { useAuthStore } from '../store/auth.store';
+import { api } from '../../services/api';
+import { useAuthStore } from '../../store/auth.store';
 
 export default function CheckinScreen() {
-  const token = useAuthStore((s) => s.token);
+  const session = useAuthStore((s) => s.session);
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const [resultado, setResultado] = useState<{ pontosGanhos: number; descricoes: string[] } | null>(null);
 
   async function handleBarCodeScanned({ data }: { data: string }) {
-    if (scanned || !token) return;
+    if (scanned || !session) return;
     setScanned(true);
     try {
-      const res = await api.checkins.validar(data, token);
+      const res = await api.checkins.validar(data, session.userId, session.academiaId);
       setResultado(res);
     } catch (err: any) {
       Alert.alert('Erro', err.message ?? 'Erro ao fazer check-in');
