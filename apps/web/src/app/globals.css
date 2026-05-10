@@ -3,49 +3,217 @@
 @tailwind utilities;
 
 @layer base {
-  :root {
+  :root,
+  .theme-emerald-charcoal {
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
-    --primary: 142 76% 36%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --primary: 160 84% 39%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 13% 91%;
+    --secondary-foreground: 220 9% 15%;
+    --accent: 220 9% 15%;
+    --accent-foreground: 0 0% 100%;
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 142 76% 36%;
+    --ring: 160 84% 39%;
     --radius: 0.5rem;
   }
 
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --primary: 142 76% 36%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 142 76% 36%;
+  .theme-blue-gold {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --accent: 38 92% 50%;
+    --accent-foreground: 0 0% 100%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 217 91% 60%;
+    --radius: 0.5rem;
   }
-}
 
-@layer base {
+  .theme-purple-orange {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --primary: 271 81% 56%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 270 20% 96%;
+    --secondary-foreground: 271 50% 20%;
+    --accent: 21 90% 48%;
+    --accent-foreground: 0 0% 100%;
+    --muted: 270 20% 96%;
+    --muted-foreground: 271 10% 46%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 270 20% 91%;
+    --input: 270 20% 91%;
+    --ring: 271 81% 56%;
+    --radius: 0.5rem;
+  }
+
+  .theme-red-graphite {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --primary: 0 72% 51%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 215 20% 95%;
+    --secondary-foreground: 215 25% 27%;
+    --accent: 215 25% 34%;
+    --accent-foreground: 0 0% 100%;
+    --muted: 215 20% 95%;
+    --muted-foreground: 215 16% 47%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 215 20% 91%;
+    --input: 215 20% 91%;
+    --ring: 0 72% 51%;
+    --radius: 0.5rem;
+  }
+
+  .theme-cyan-pink {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --primary: 187 86% 53%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 187 20% 95%;
+    --secondary-foreground: 187 50% 15%;
+    --accent: 330 81% 60%;
+    --accent-foreground: 0 0% 100%;
+    --muted: 187 20% 95%;
+    --muted-foreground: 187 10% 46%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 187 20% 91%;
+    --input: 187 20% 91%;
+    --ring: 187 86% 53%;
+    --radius: 0.5rem;
+  }
+
+  .theme-indigo-lime {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --primary: 239 84% 67%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 239 20% 96%;
+    --secondary-foreground: 239 50% 15%;
+    --accent: 84 81% 44%;
+    --accent-foreground: 0 0% 100%;
+    --muted: 239 20% 96%;
+    --muted-foreground: 239 10% 46%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 239 20% 91%;
+    --input: 239 20% 91%;
+    --ring: 239 84% 67%;
+    --radius: 0.5rem;
+  }
+
+  .theme-dark-neon {
+    --background: 220 14% 10%;
+    --foreground: 0 0% 95%;
+    --card: 220 14% 14%;
+    --card-foreground: 0 0% 95%;
+    --primary: 142 71% 45%;
+    --primary-foreground: 220 14% 10%;
+    --secondary: 220 14% 20%;
+    --secondary-foreground: 0 0% 90%;
+    --accent: 142 71% 45%;
+    --accent-foreground: 220 14% 10%;
+    --muted: 220 14% 20%;
+    --muted-foreground: 220 10% 60%;
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 14% 22%;
+    --input: 220 14% 22%;
+    --ring: 142 71% 45%;
+    --radius: 0.5rem;
+  }
+
+  .theme-navy-white {
+    --background: 0 0% 100%;
+    --foreground: 213 50% 20%;
+    --card: 0 0% 100%;
+    --card-foreground: 213 50% 20%;
+    --primary: 213 56% 24%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 213 20% 96%;
+    --secondary-foreground: 213 50% 20%;
+    --accent: 210 40% 98%;
+    --accent-foreground: 213 50% 20%;
+    --muted: 213 20% 96%;
+    --muted-foreground: 213 16% 50%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 213 20% 91%;
+    --input: 213 20% 91%;
+    --ring: 213 56% 24%;
+    --radius: 0.5rem;
+  }
+
+  .theme-coral-teal {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --primary: 350 89% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 350 20% 96%;
+    --secondary-foreground: 350 50% 15%;
+    --accent: 168 76% 42%;
+    --accent-foreground: 0 0% 100%;
+    --muted: 350 20% 96%;
+    --muted-foreground: 350 10% 46%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 350 20% 91%;
+    --input: 350 20% 91%;
+    --ring: 350 89% 60%;
+    --radius: 0.5rem;
+  }
+
+  .theme-violet-amber {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --primary: 263 70% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 263 20% 96%;
+    --secondary-foreground: 263 50% 15%;
+    --accent: 38 92% 50%;
+    --accent-foreground: 0 0% 100%;
+    --muted: 263 20% 96%;
+    --muted-foreground: 263 10% 46%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 263 20% 91%;
+    --input: 263 20% 91%;
+    --ring: 263 70% 50%;
+    --radius: 0.5rem;
+  }
+
   * {
     @apply border-border;
   }
@@ -56,9 +224,18 @@
 
 @layer components {
   .input {
-    @apply block w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm shadow-sm placeholder:text-gray-400 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 transition;
+    @apply flex h-10 w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm shadow-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-primary {
-    @apply w-full rounded-lg bg-green-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-green-700 disabled:opacity-50 transition;
+    @apply inline-flex items-center justify-center w-full rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm hover:opacity-90 disabled:opacity-50 transition;
+  }
+  .btn-secondary {
+    @apply inline-flex items-center justify-center rounded-lg bg-secondary px-4 py-2.5 text-sm font-semibold text-secondary-foreground shadow-sm hover:opacity-80 transition;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center rounded-lg border border-border bg-transparent px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-secondary transition;
+  }
+  .btn-ghost {
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-secondary transition;
   }
 }

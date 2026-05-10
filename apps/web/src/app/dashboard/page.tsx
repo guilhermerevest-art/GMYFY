@@ -1,8 +1,12 @@
-﻿'use client';
+'use client';
 
 import { useEffect, useState } from 'react';
 import { useSession } from '@/lib/use-session';
 import { getRelatorioMensal } from '@/lib/queries';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Grid, StatCard } from '@/components/ui/grid';
+import { Badge } from '@/components/ui/badge';
+import { BarChart3, Users, TrendingUp } from 'lucide-react';
 
 interface Relatorio {
   totalCheckins: number;
@@ -24,44 +28,65 @@ export default function DashboardPage() {
       .finally(() => setLoading(false));
   }, [session]);
 
-  if (sessionLoading || loading) return <div className="animate-pulse text-gray-400">Carregando...</div>;
+  if (sessionLoading || loading) {
+    return (
+      <div className="space-y-8">
+        <div className="h-8 w-48 rounded-lg bg-muted animate-pulse" />
+        <Grid cols={3}>
+          {[1, 2, 3].map((i) => <div key={i} className="h-32 rounded-xl bg-muted animate-pulse" />)}
+        </Grid>
+      </div>
+    );
+  }
+
+  const medals = ['🥇', '🥈', '🥉'];
 
   return (
     <div className="space-y-8">
-      <h2 className="text-2xl font-bold text-gray-800">Dashboard</h2>
+      <h2 className="text-2xl font-bold text-foreground">Dashboard</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="rounded-xl bg-white p-6 shadow-sm border">
-          <p className="text-sm text-gray-500">Check-ins este mês</p>
-          <p className="text-3xl font-bold text-green-700">{data?.totalCheckins ?? 0}</p>
-        </div>
-        <div className="rounded-xl bg-white p-6 shadow-sm border">
-          <p className="text-sm text-gray-500">Alunos ativos</p>
-          <p className="text-3xl font-bold text-green-700">{data?.alunosAtivos ?? 0}</p>
-        </div>
-        <div className="rounded-xl bg-white p-6 shadow-sm border">
-          <p className="text-sm text-gray-500">Média check-ins/aluno</p>
-          <p className="text-3xl font-bold text-green-700">{data?.mediaCheckinsPorAluno ?? 0}</p>
-        </div>
-      </div>
+      <Grid cols={3}>
+        <StatCard
+          label="Check-ins este mês"
+          value={data?.totalCheckins ?? 0}
+          icon={<BarChart3 className="w-5 h-5" />}
+          trend="Mês atual"
+        />
+        <StatCard
+          label="Alunos ativos"
+          value={data?.alunosAtivos ?? 0}
+          icon={<Users className="w-5 h-5" />}
+          trend="Com check-in no mês"
+        />
+        <StatCard
+          label="Média check-ins/aluno"
+          value={data?.mediaCheckinsPorAluno ?? 0}
+          icon={<TrendingUp className="w-5 h-5" />}
+          trend="Este mês"
+        />
+      </Grid>
 
-      <div className="rounded-xl bg-white p-6 shadow-sm border">
-        <h3 className="text-lg font-semibold text-gray-800 mb-4">Top Alunos do Mês</h3>
-        <div className="space-y-3">
-          {data?.topAlunos?.map((item, idx) => (
-            <div key={idx} className="flex items-center justify-between py-2 border-b last:border-0">
-              <div className="flex items-center gap-3">
-                <span className="text-lg font-bold text-gray-400 w-6">{idx + 1}</span>
-                <span className="font-medium text-gray-700">{item.aluno?.nome ?? 'Aluno'}</span>
+      <Card>
+        <CardHeader>
+          <CardTitle>Top Alunos do Mês</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            {data?.topAlunos?.map((item, idx) => (
+              <div key={idx} className="flex items-center justify-between py-2.5 border-b border-border last:border-0">
+                <div className="flex items-center gap-3">
+                  <span className="text-lg w-7 text-center">{medals[idx] ?? <span className="text-sm font-bold text-muted-foreground">{idx + 1}</span>}</span>
+                  <span className="font-medium text-foreground">{item.aluno?.nome ?? 'Aluno'}</span>
+                </div>
+                <Badge variant="default">{item.checkins} check-ins</Badge>
               </div>
-              <span className="text-sm font-semibold text-green-600">{item.checkins} check-ins</span>
-            </div>
-          ))}
-          {(!data?.topAlunos || data.topAlunos.length === 0) && (
-            <p className="text-gray-400 text-sm">Nenhum check-in registrado este mês</p>
-          )}
-        </div>
-      </div>
+            ))}
+            {(!data?.topAlunos || data.topAlunos.length === 0) && (
+              <p className="text-muted-foreground text-sm py-4 text-center">Nenhum check-in registrado este mês</p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
