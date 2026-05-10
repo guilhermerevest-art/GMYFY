@@ -13,9 +13,6 @@
     "paths": {
       "@/*": [
         "./src/*"
-      ],
-      "@gymfy/shared": [
-        "../../packages/shared/src/index.ts"
       ]
     },
     "allowJs": true,
