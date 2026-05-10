@@ -1,0 +1,32 @@
+services:
+  - type: web
+    name: gymfy-api
+    runtime: node
+    rootDir: apps/api
+    buildCommand: cd ../.. && pnpm install && pnpm --filter api build
+    startCommand: node dist/apps/api/src/main.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      - key: DATABASE_URL
+        sync: false
+      - key: DIRECT_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: JWT_QR_SECRET
+        sync: false
+      - key: SUPABASE_URL
+        value: https://baqxljihngymjnasrdtl.supabase.co
+      - key: SUPABASE_SERVICE_KEY
+        sync: false
+      - key: SISTEMA_ID
+        value: e416ae5e-fad9-43ac-a6a2-00fde07c744a
+      - key: APP_URL
+        sync: false
