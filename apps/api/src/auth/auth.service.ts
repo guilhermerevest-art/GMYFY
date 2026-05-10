@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto, LoginDto } from './dto/auth.dto';
-import { TipoUsuario, SISTEMA_ID } from '@gymfy/shared';
+import { TipoUsuario, SISTEMA_ID } from '../shared/constants';
 
 @Injectable()
 export class AuthService {

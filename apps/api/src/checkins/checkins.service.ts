@@ -12,7 +12,7 @@ import {
   PONTOS_BONUS_PRIMEIRO_SEMANA,
   PONTOS_BONUS_SEMANA_PERFEITA,
   PONTOS_BONUS_FORA_PICO,
-} from '@gymfy/shared';
+} from '../shared/constants';
 
 interface QrPayload {
   academiaId: string;

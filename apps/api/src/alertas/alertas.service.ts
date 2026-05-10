@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service';
 import { WhatsAppService } from '../whatsapp/whatsapp.service';
-import { CHURN_DIAS_RISCO_BAIXO, CHURN_DIAS_RISCO_MEDIO, CHURN_DIAS_RISCO_ALTO, RiscoChurn } from '@gymfy/shared';
+import { CHURN_DIAS_RISCO_BAIXO, CHURN_DIAS_RISCO_MEDIO, CHURN_DIAS_RISCO_ALTO, RiscoChurn } from '../shared/constants';
 
 @Injectable()
 export class AlertasService {

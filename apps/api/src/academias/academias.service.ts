@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, ConflictException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateAcademiaDto, UpdateAcademiaDto, UpdateConfiguracaoDto } from './dto/academia.dto';
-import { SISTEMA_ID } from '@gymfy/shared';
+import { SISTEMA_ID } from '../shared/constants';
 
 @Injectable()
 export class AcademiasService {

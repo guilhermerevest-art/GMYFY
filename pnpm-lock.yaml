@@ -23,9 +23,6 @@ importers:
 
   apps/api:
     dependencies:
-      '@gymfy/shared':
-        specifier: workspace:*
-        version: link:../../packages/shared
       '@nestjs/cli':
         specifier: ^10.4.5
         version: 10.4.9
