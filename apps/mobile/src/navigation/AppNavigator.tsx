@@ -12,6 +12,7 @@ import RankingScreen from '../screens/ranking/RankingScreen';
 import DesafiosScreen from '../screens/desafios/DesafiosScreen';
 import PremiosScreen from '../screens/premios/PremiosScreen';
 import PerfilScreen from '../screens/perfil/PerfilScreen';
+import PontuacaoScreen from '../screens/pontuacao/PontuacaoScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -30,6 +31,7 @@ function MainTabs() {
       <Tab.Screen name="Checkin" component={CheckinScreen} options={{ tabBarLabel: 'Check-in', tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>📷</Text> }} />
       <Tab.Screen name="Ranking" component={RankingScreen} options={{ tabBarLabel: 'Ranking', tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>🏆</Text> }} />
       <Tab.Screen name="Desafios" component={DesafiosScreen} options={{ tabBarLabel: 'Desafios', tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>⚡</Text> }} />
+      <Tab.Screen name="Pontuacao" component={PontuacaoScreen} options={{ tabBarLabel: 'Pontos', tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>⭐</Text> }} />
       <Tab.Screen name="Premios" component={PremiosScreen} options={{ tabBarLabel: 'Prêmios', tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>🎁</Text> }} />
       <Tab.Screen name="Perfil" component={PerfilScreen} options={{ tabBarLabel: 'Perfil', tabBarIcon: ({ color }) => <Text style={{ color, fontSize: 20 }}>👤</Text> }} />
     </Tab.Navigator>

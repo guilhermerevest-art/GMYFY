@@ -138,6 +138,31 @@ export const api = {
     },
   },
 
+  pontuacao: {
+    resumo: async (userId: string, academiaId: string) => {
+      const [{ data: pontosData }, { data: streakData }] = await Promise.all([
+        supabase.from('gymfy_pontos').select('quantidade').eq('aluno_id', userId).eq('academia_id', academiaId),
+        supabase.from('gymfy_streaks').select('streak_atual, maior_streak').eq('aluno_id', userId).eq('academia_id', academiaId).single(),
+      ]);
+      const totalPontos = (pontosData ?? []).reduce((acc, p) => acc + p.quantidade, 0);
+      return {
+        totalPontos,
+        streakAtual: streakData?.streak_atual ?? 0,
+        maiorStreak: streakData?.maior_streak ?? 0,
+      };
+    },
+
+    historico: async (userId: string) => {
+      const { data } = await supabase
+        .from('gymfy_pontos')
+        .select('id, quantidade, descricao, criado_em')
+        .eq('aluno_id', userId)
+        .order('criado_em', { ascending: false })
+        .limit(50);
+      return data ?? [];
+    },
+  },
+
   notificacoes: {
     get: async (userId: string) => {
       const { data } = await supabase
