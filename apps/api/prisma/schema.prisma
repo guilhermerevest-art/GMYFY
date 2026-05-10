@@ -40,6 +40,7 @@ model GymfyUsuario {
   nome         String
   email        String      @unique
   senhaHash    String?     @map("senha_hash")
+  telefone     String?
   tipo         TipoUsuario @default(ALUNO)
   avatarUrl    String?     @map("avatar_url")
   fcmToken     String?     @map("fcm_token")

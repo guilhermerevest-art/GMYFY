@@ -1,0 +1,1 @@
+ALTER TABLE gymfy_usuarios ADD COLUMN IF NOT EXISTS telefone TEXT;

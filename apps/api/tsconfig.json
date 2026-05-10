@@ -17,7 +17,7 @@
     "noUnusedParameters": false,
     "sourceMap": true,
     "paths": {
-      "@gymfy/shared": ["../../packages/shared/src/index.ts"]
+      "@gymfy/shared": ["../../packages/shared/dist/index.d.ts"]
     }
   },
   "include": ["src/**/*"],

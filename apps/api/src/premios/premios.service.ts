@@ -1,10 +1,14 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { WhatsAppService } from '../whatsapp/whatsapp.service';
 import { CreatePremioDto, UpdatePremioDto } from './dto/premio.dto';
 
 @Injectable()
 export class PremiosService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private whatsapp: WhatsAppService,
+  ) {}
 
   async create(academiaId: string, dto: CreatePremioDto) {
     return this.prisma.gymfyPremio.create({
@@ -72,9 +76,21 @@ export class PremiosService {
   }
 
   async atualizarStatusResgate(resgateId: string, status: string) {
-    return this.prisma.gymfyResgate.update({
+    const resgate = await this.prisma.gymfyResgate.update({
       where: { id: resgateId },
       data: { status: status as any },
+      include: {
+        aluno: { select: { nome: true, telefone: true } },
+        premio: { select: { nome: true } },
+      },
     });
+
+    // Notifica aluno via WhatsApp quando resgate é aprovado
+    if (status === 'APROVADO' && resgate.aluno.telefone) {
+      const msg = this.whatsapp.mensagemResgateAprovado(resgate.aluno.nome, resgate.premio.nome);
+      await this.whatsapp.enviarMensagem(resgate.aluno.telefone, msg);
+    }
+
+    return resgate;
   }
 }

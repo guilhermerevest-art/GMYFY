@@ -15,6 +15,7 @@ import { AlertasModule } from './alertas/alertas.module';
 import { NotificacoesModule } from './notificacoes/notificacoes.module';
 import { RelatoriosModule } from './relatorios/relatorios.module';
 import { FeedModule } from './feed/feed.module';
+import { WhatsAppModule } from './whatsapp/whatsapp.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { FeedModule } from './feed/feed.module';
     NotificacoesModule,
     RelatoriosModule,
     FeedModule,
+    WhatsAppModule,
   ],
 })
 export class AppModule {}

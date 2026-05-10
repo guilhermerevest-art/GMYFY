@@ -4,7 +4,7 @@ services:
     runtime: node
     rootDir: apps/api
     buildCommand: cd ../.. && pnpm install && pnpm --filter api build
-    startCommand: node dist/apps/api/src/main.js
+    startCommand: node dist/main.js
     envVars:
       - key: NODE_ENV
         value: production
@@ -30,3 +30,9 @@ services:
         value: e416ae5e-fad9-43ac-a6a2-00fde07c744a
       - key: APP_URL
         sync: false
+      - key: EVOLUTION_API_URL
+        sync: false
+      - key: EVOLUTION_API_KEY
+        sync: false
+      - key: EVOLUTION_INSTANCE
+        value: gymfy
