@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "Gymfy",
+    "slug": "gymfy",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#16a34a"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.gymfy.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#16a34a"
+      },
+      "package": "com.gymfy.app"
+    },
+    "plugins": [
+      "expo-router",
+      ["expo-camera", { "cameraPermission": "Permitir acesso à câmera para fazer check-in" }],
+      ["expo-notifications", { "icon": "./assets/icon.png", "color": "#16a34a" }]
+    ],
+    "scheme": "gymfy",
+    "extra": {
+      "apiUrl": "http://localhost:3001"
+    }
+  }
+}

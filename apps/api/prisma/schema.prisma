@@ -1,0 +1,320 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model GymfyAcademia {
+  id          String   @id @default(uuid())
+  sistemaId   String   @map("sistema_id")
+  nome        String
+  slug        String   @unique
+  email       String   @unique
+  telefone    String?
+  endereco    String?
+  logoUrl     String?  @map("logo_url")
+  corPrimaria String?  @map("cor_primaria")
+  ativo       Boolean  @default(true)
+  criadoEm   DateTime @default(now()) @map("criado_em")
+  atualizadoEm DateTime @updatedAt @map("atualizado_em")
+
+  usuarios       GymfyUsuario[]
+  alunoAcademias GymfyAlunoAcademia[]
+  checkIns       GymfyCheckIn[]
+  desafios       GymfyDesafio[]
+  premios        GymfyPremio[]
+  configuracoes  GymfyConfiguracaoAcademia?
+  feedPosts      GymfyFeedPost[]
+
+  @@map("gymfy_academias")
+}
+
+model GymfyUsuario {
+  id           String      @id @default(uuid())
+  sistemaId    String      @map("sistema_id")
+  academiaId   String?     @map("academia_id")
+  nome         String
+  email        String      @unique
+  senhaHash    String?     @map("senha_hash")
+  tipo         TipoUsuario @default(ALUNO)
+  avatarUrl    String?     @map("avatar_url")
+  fcmToken     String?     @map("fcm_token")
+  ativo        Boolean     @default(true)
+  criadoEm    DateTime    @default(now()) @map("criado_em")
+  atualizadoEm DateTime   @updatedAt @map("atualizado_em")
+
+  academia       GymfyAcademia?       @relation(fields: [academiaId], references: [id])
+  alunoAcademias GymfyAlunoAcademia[]
+  checkIns       GymfyCheckIn[]
+  pontos         GymfyPonto[]
+  conquistasAluno GymfyConquistaAluno[]
+  desafioParticipantes GymfyDesafioParticipante[]
+  resgates       GymfyResgate[]
+  notificacoes   GymfyNotificacao[]
+  alertasChurn   GymfyAlertaChurn[]
+  feedPosts      GymfyFeedPost[]
+  feedReacoes    GymfyFeedReacao[]
+
+  @@map("gymfy_usuarios")
+}
+
+model GymfyAlunoAcademia {
+  id         String   @id @default(uuid())
+  alunoId    String   @map("aluno_id")
+  academiaId String   @map("academia_id")
+  ativo      Boolean  @default(true)
+  criadoEm  DateTime @default(now()) @map("criado_em")
+
+  aluno    GymfyUsuario  @relation(fields: [alunoId], references: [id])
+  academia GymfyAcademia @relation(fields: [academiaId], references: [id])
+
+  @@unique([alunoId, academiaId])
+  @@map("gymfy_aluno_academia")
+}
+
+model GymfyCheckIn {
+  id         String   @id @default(uuid())
+  alunoId    String   @map("aluno_id")
+  academiaId String   @map("academia_id")
+  pontosGanhos Int    @default(0) @map("pontos_ganhos")
+  foraHorarioPico Boolean @default(false) @map("fora_horario_pico")
+  criadoEm  DateTime @default(now()) @map("criado_em")
+
+  aluno    GymfyUsuario  @relation(fields: [alunoId], references: [id])
+  academia GymfyAcademia @relation(fields: [academiaId], references: [id])
+  pontos   GymfyPonto[]
+
+  @@map("gymfy_check_ins")
+}
+
+model GymfyPonto {
+  id         String   @id @default(uuid())
+  alunoId    String   @map("aluno_id")
+  academiaId String   @map("academia_id")
+  checkInId  String?  @map("check_in_id")
+  quantidade Int
+  descricao  String?
+  criadoEm  DateTime @default(now()) @map("criado_em")
+
+  aluno   GymfyUsuario  @relation(fields: [alunoId], references: [id])
+  checkIn GymfyCheckIn? @relation(fields: [checkInId], references: [id])
+
+  @@map("gymfy_pontos")
+}
+
+model GymfyRankingHistorico {
+  id         String   @id @default(uuid())
+  alunoId    String   @map("aluno_id")
+  academiaId String   @map("academia_id")
+  periodo    String
+  posicao    Int
+  pontos     Int
+  criadoEm  DateTime @default(now()) @map("criado_em")
+
+  @@map("gymfy_rankings_historico")
+}
+
+model GymfyConquista {
+  id        String   @id @default(uuid())
+  nome      String
+  descricao String
+  icone     String?
+  criterio  String
+  valor     Int
+  criadoEm DateTime @default(now()) @map("criado_em")
+
+  conquistasAluno GymfyConquistaAluno[]
+
+  @@map("gymfy_conquistas")
+}
+
+model GymfyConquistaAluno {
+  id           String   @id @default(uuid())
+  alunoId      String   @map("aluno_id")
+  conquistaId  String   @map("conquista_id")
+  criadoEm    DateTime @default(now()) @map("criado_em")
+
+  aluno     GymfyUsuario   @relation(fields: [alunoId], references: [id])
+  conquista GymfyConquista @relation(fields: [conquistaId], references: [id])
+
+  @@unique([alunoId, conquistaId])
+  @@map("gymfy_conquistas_aluno")
+}
+
+model GymfyDesafio {
+  id          String        @id @default(uuid())
+  academiaId  String        @map("academia_id")
+  nome        String
+  descricao   String?
+  tipo        TipoDesafio   @default(INDIVIDUAL)
+  status      StatusDesafio @default(RASCUNHO)
+  metaCheckins Int?         @map("meta_checkins")
+  pontosBonus  Int          @default(0) @map("pontos_bonus")
+  inicioEm    DateTime      @map("inicio_em")
+  fimEm       DateTime      @map("fim_em")
+  criadoEm   DateTime      @default(now()) @map("criado_em")
+  atualizadoEm DateTime    @updatedAt @map("atualizado_em")
+
+  academia     GymfyAcademia            @relation(fields: [academiaId], references: [id])
+  participantes GymfyDesafioParticipante[]
+
+  @@map("gymfy_desafios")
+}
+
+model GymfyDesafioParticipante {
+  id         String   @id @default(uuid())
+  desafioId  String   @map("desafio_id")
+  alunoId    String   @map("aluno_id")
+  progresso  Int      @default(0)
+  concluido  Boolean  @default(false)
+  criadoEm  DateTime @default(now()) @map("criado_em")
+
+  desafio GymfyDesafio @relation(fields: [desafioId], references: [id])
+  aluno   GymfyUsuario @relation(fields: [alunoId], references: [id])
+
+  @@unique([desafioId, alunoId])
+  @@map("gymfy_desafio_participantes")
+}
+
+model GymfyPremio {
+  id          String   @id @default(uuid())
+  academiaId  String   @map("academia_id")
+  nome        String
+  descricao   String?
+  imagemUrl   String?  @map("imagem_url")
+  pontosNecessarios Int @map("pontos_necessarios")
+  estoque     Int      @default(-1)
+  ativo       Boolean  @default(true)
+  criadoEm   DateTime @default(now()) @map("criado_em")
+  atualizadoEm DateTime @updatedAt @map("atualizado_em")
+
+  academia GymfyAcademia  @relation(fields: [academiaId], references: [id])
+  resgates GymfyResgate[]
+
+  @@map("gymfy_premios")
+}
+
+model GymfyResgate {
+  id        String        @id @default(uuid())
+  alunoId   String        @map("aluno_id")
+  premioId  String        @map("premio_id")
+  status    StatusResgate @default(PENDENTE)
+  criadoEm DateTime      @default(now()) @map("criado_em")
+  atualizadoEm DateTime  @updatedAt @map("atualizado_em")
+
+  aluno  GymfyUsuario @relation(fields: [alunoId], references: [id])
+  premio GymfyPremio  @relation(fields: [premioId], references: [id])
+
+  @@map("gymfy_resgates")
+}
+
+model GymfyNotificacao {
+  id        String   @id @default(uuid())
+  usuarioId String   @map("usuario_id")
+  titulo    String
+  corpo     String
+  lida      Boolean  @default(false)
+  criadoEm DateTime @default(now()) @map("criado_em")
+
+  usuario GymfyUsuario @relation(fields: [usuarioId], references: [id])
+
+  @@map("gymfy_notificacoes")
+}
+
+model GymfyAlertaChurn {
+  id         String      @id @default(uuid())
+  alunoId    String      @map("aluno_id")
+  academiaId String      @map("academia_id")
+  risco      RiscoChurn
+  diasSemCheckin Int     @map("dias_sem_checkin")
+  acaoTomada Boolean    @default(false) @map("acao_tomada")
+  criadoEm  DateTime    @default(now()) @map("criado_em")
+
+  aluno GymfyUsuario @relation(fields: [alunoId], references: [id])
+
+  @@map("gymfy_alertas_churn")
+}
+
+model GymfyFeedPost {
+  id         String   @id @default(uuid())
+  autorId    String   @map("autor_id")
+  academiaId String   @map("academia_id")
+  conteudo   String?
+  imagemUrl  String?  @map("imagem_url")
+  criadoEm  DateTime @default(now()) @map("criado_em")
+
+  autor    GymfyUsuario    @relation(fields: [autorId], references: [id])
+  academia GymfyAcademia   @relation(fields: [academiaId], references: [id])
+  reacoes  GymfyFeedReacao[]
+
+  @@map("gymfy_feed_posts")
+}
+
+model GymfyFeedReacao {
+  id      String     @id @default(uuid())
+  postId  String     @map("post_id")
+  autorId String     @map("autor_id")
+  tipo    TipoReacao
+
+  post  GymfyFeedPost @relation(fields: [postId], references: [id])
+  autor GymfyUsuario  @relation(fields: [autorId], references: [id])
+
+  @@unique([postId, autorId])
+  @@map("gymfy_feed_reacoes")
+}
+
+model GymfyConfiguracaoAcademia {
+  id                    String   @id @default(uuid())
+  academiaId            String   @unique @map("academia_id")
+  horarioPicoInicio     String?  @map("horario_pico_inicio")
+  horarioPicoFim        String?  @map("horario_pico_fim")
+  minimoCheckinsSemana  Int      @default(3) @map("minimo_checkins_semana")
+  atualizadoEm         DateTime @updatedAt @map("atualizado_em")
+
+  academia GymfyAcademia @relation(fields: [academiaId], references: [id])
+
+  @@map("gymfy_configuracoes_academia")
+}
+
+enum TipoUsuario {
+  ADMIN
+  ACADEMIA
+  ALUNO
+}
+
+enum TipoDesafio {
+  INDIVIDUAL
+  GRUPO
+  TURMA
+}
+
+enum StatusDesafio {
+  RASCUNHO
+  ATIVO
+  FINALIZADO
+  CANCELADO
+}
+
+enum StatusResgate {
+  PENDENTE
+  APROVADO
+  REJEITADO
+  ENTREGUE
+}
+
+enum RiscoChurn {
+  SEM_RISCO
+  RISCO_BAIXO
+  RISCO_MEDIO
+  RISCO_ALTO
+}
+
+enum TipoReacao {
+  CORAGEM
+  FOGO
+  TROFEU
+}
