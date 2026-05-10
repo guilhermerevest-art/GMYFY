@@ -5,8 +5,8 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Gymfy - Painel da Academia',
-  description: 'Plataforma de gamificação para academias',
+  title: 'Gymfy — Gamificação para Academias | Reduza o churn em até 40%',
+  description: 'Plataforma de gamificação B2B que transforma a frequência na academia em uma experiência competitiva e recompensadora. Rankings, desafios e premiações para reter alunos.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
