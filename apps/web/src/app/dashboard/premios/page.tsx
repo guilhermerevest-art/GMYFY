@@ -1,9 +1,11 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
-import { api } from '@/lib/api';
+import { useSession } from '@/lib/use-session';
+import { getPremios, createPremio, getResgates } from '@/lib/queries';
 
 export default function PremiosPage() {
+  const { session } = useSession();
   const [premios, setPremios] = useState<any[]>([]);
   const [resgates, setResgates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -12,20 +14,17 @@ export default function PremiosPage() {
   const [aba, setAba] = useState<'vitrine' | 'resgates'>('vitrine');
 
   useEffect(() => {
-    const token = localStorage.getItem('gymfy_token');
-    if (!token) return;
-    const payload = JSON.parse(atob(token.split('.')[1]!));
+    if (!session?.academiaId) return;
     Promise.all([
-      api.premios.getAll(payload.academiaId, token),
-      api.premios.getResgates(token),
+      getPremios(session.academiaId),
+      getResgates(session.academiaId),
     ]).then(([p, r]) => { setPremios(p); setResgates(r); }).catch(console.error).finally(() => setLoading(false));
-  }, []);
+  }, [session]);
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
-    const token = localStorage.getItem('gymfy_token');
-    if (!token) return;
-    const novo = await api.premios.create(form, token);
+    if (!session?.academiaId) return;
+    const novo = await createPremio(session.academiaId, form);
     setPremios((prev) => [novo, ...prev]);
     setShowForm(false);
   }
@@ -102,8 +101,8 @@ export default function PremiosPage() {
             <tbody className="divide-y">
               {resgates.map((r) => (
                 <tr key={r.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 font-medium text-gray-800">{r.aluno?.nome}</td>
-                  <td className="px-4 py-3 text-gray-600">{r.premio?.nome}</td>
+                  <td className="px-4 py-3 font-medium text-gray-800">{(r.aluno as any)?.nome}</td>
+                  <td className="px-4 py-3 text-gray-600">{(r.premio as any)?.nome}</td>
                   <td className="px-4 py-3">
                     <span className="rounded-full bg-yellow-100 text-yellow-800 px-2 py-0.5 text-xs font-medium">{r.status}</span>
                   </td>

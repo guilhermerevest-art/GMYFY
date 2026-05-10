@@ -1,28 +1,27 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
-import { api } from '@/lib/api';
+import { useSession } from '@/lib/use-session';
+import { getDesafios, createDesafio } from '@/lib/queries';
 import { formatDate } from '@/lib/utils';
 
 export default function DesafiosPage() {
+  const { session } = useSession();
   const [desafios, setDesafios] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ nome: '', descricao: '', metaCheckins: 12, pontosBonus: 50, inicioEm: '', fimEm: '' });
 
   useEffect(() => {
-    const token = localStorage.getItem('gymfy_token');
-    if (!token) return;
-    const payload = JSON.parse(atob(token.split('.')[1]!));
-    api.desafios.getAll(payload.academiaId, token).then(setDesafios).catch(console.error).finally(() => setLoading(false));
-  }, []);
+    if (!session?.academiaId) return;
+    getDesafios(session.academiaId).then(setDesafios).catch(console.error).finally(() => setLoading(false));
+  }, [session]);
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
-    const token = localStorage.getItem('gymfy_token');
-    if (!token) return;
-    const novo = await api.desafios.create(form, token);
-    setDesafios((prev) => [novo, ...prev]);
+    if (!session?.academiaId) return;
+    const novo = await createDesafio(session.academiaId, form);
+    setDesafios((prev) => [{ ...novo, inicioEm: novo.inicio_em, fimEm: novo.fim_em, metaCheckins: novo.meta_checkins, _count: { participantes: 0 } }, ...prev]);
     setShowForm(false);
   }
 

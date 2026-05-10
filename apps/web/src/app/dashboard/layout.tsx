@@ -1,7 +1,7 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -16,6 +16,12 @@ const navItems = [
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  async function handleLogout() {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    router.push('/login');
+  }
 
   return (
     <div className="flex min-h-screen">
@@ -42,7 +48,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           ))}
         </nav>
         <button
-          onClick={() => { localStorage.removeItem('gymfy_token'); window.location.href = '/login'; }}
+          onClick={handleLogout}
           className="mt-4 text-sm text-gray-500 hover:text-red-600 transition"
         >
           Sair

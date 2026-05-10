@@ -1,7 +1,8 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
-import { api } from '@/lib/api';
+import { useSession } from '@/lib/use-session';
+import { getRelatorioMensal } from '@/lib/queries';
 
 interface Relatorio {
   totalCheckins: number;
@@ -11,16 +12,19 @@ interface Relatorio {
 }
 
 export default function DashboardPage() {
+  const { session, loading: sessionLoading } = useSession();
   const [data, setData] = useState<Relatorio | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('gymfy_token');
-    if (!token) { window.location.href = '/login'; return; }
-    api.relatorios.getMensal(token).then(setData).catch(console.error).finally(() => setLoading(false));
-  }, []);
+    if (!session?.academiaId) return;
+    getRelatorioMensal(session.academiaId)
+      .then(setData)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, [session]);
 
-  if (loading) return <div className="animate-pulse text-gray-400">Carregando...</div>;
+  if (sessionLoading || loading) return <div className="animate-pulse text-gray-400">Carregando...</div>;
 
   return (
     <div className="space-y-8">

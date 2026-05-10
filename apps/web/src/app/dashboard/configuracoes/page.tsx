@@ -1,21 +1,21 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
-import { api } from '@/lib/api';
+import { useSession } from '@/lib/use-session';
+import { getAcademia, updateConfiguracoes } from '@/lib/queries';
 
 export default function ConfiguracoesPage() {
+  const { session } = useSession();
   const [academia, setAcademia] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({ horarioPicoInicio: '', horarioPicoFim: '', minimoCheckinsSemana: 3 });
 
   useEffect(() => {
-    const token = localStorage.getItem('gymfy_token');
-    if (!token) return;
-    const payload = JSON.parse(atob(token.split('.')[1]!));
-    api.academias.get(payload.academiaId, token).then((a) => {
+    if (!session?.academiaId) return;
+    getAcademia(session.academiaId).then((a) => {
       setAcademia(a);
-      if (a.configuracoes) {
+      if (a?.configuracoes) {
         setForm({
           horarioPicoInicio: a.configuracoes.horarioPicoInicio ?? '',
           horarioPicoFim: a.configuracoes.horarioPicoFim ?? '',
@@ -23,19 +23,14 @@ export default function ConfiguracoesPage() {
         });
       }
     }).catch(console.error).finally(() => setLoading(false));
-  }, []);
+  }, [session]);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
-    const token = localStorage.getItem('gymfy_token');
-    if (!token || !academia) return;
+    if (!session?.academiaId) return;
     setSaving(true);
     try {
-      await fetch(`${process.env['NEXT_PUBLIC_API_URL'] ?? 'http://localhost:3001'}/academias/${academia.id}/configuracoes`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(form),
-      });
+      await updateConfiguracoes(session.academiaId, form);
     } finally {
       setSaving(false);
     }

@@ -1,9 +1,8 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { api } from '@/lib/api';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,8 +16,15 @@ export default function LoginPage() {
     setErro('');
     setLoading(true);
     try {
-      const res = await api.auth.login(email, senha);
-      localStorage.setItem('gymfy_token', res.access_token);
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, senha }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message ?? 'Erro ao fazer login');
+      }
       router.push('/dashboard');
     } catch (err: any) {
       setErro(err.message ?? 'Erro ao fazer login');
@@ -41,47 +47,26 @@ export default function LoginPage() {
           )}
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-              E-mail
-            </label>
-            <input
-              id="email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
-            />
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">E-mail</label>
+            <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500" />
           </div>
 
           <div>
-            <label htmlFor="senha" className="block text-sm font-medium text-gray-700">
-              Senha
-            </label>
-            <input
-              id="senha"
-              type="password"
-              required
-              value={senha}
-              onChange={(e) => setSenha(e.target.value)}
-              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
-            />
+            <label htmlFor="senha" className="block text-sm font-medium text-gray-700">Senha</label>
+            <input id="senha" type="password" required value={senha} onChange={(e) => setSenha(e.target.value)}
+              className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500" />
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-md bg-green-600 px-4 py-2 text-white font-medium hover:bg-green-700 disabled:opacity-50 transition"
-          >
+          <button type="submit" disabled={loading}
+            className="w-full rounded-md bg-green-600 px-4 py-2 text-white font-medium hover:bg-green-700 disabled:opacity-50 transition">
             {loading ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
 
         <p className="text-center text-sm text-gray-600">
           Ainda não tem conta?{' '}
-          <Link href="/register" className="text-green-600 hover:underline">
-            Cadastre sua academia
-          </Link>
+          <Link href="/register" className="text-green-600 hover:underline">Cadastre sua academia</Link>
         </p>
       </div>
     </div>

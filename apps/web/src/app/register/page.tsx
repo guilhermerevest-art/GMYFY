@@ -1,13 +1,12 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { api } from '@/lib/api';
 
 export default function RegisterPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ nome: '', email: '', senha: '', nomeAcademia: '', slug: '' });
+  const [form, setForm] = useState({ nome: '', email: '', senha: '' });
   const [erro, setErro] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -20,13 +19,15 @@ export default function RegisterPage() {
     setErro('');
     setLoading(true);
     try {
-      const res = await api.auth.register({
-        nome: form.nome,
-        email: form.email,
-        senha: form.senha,
-        tipo: 'ACADEMIA',
+      const res = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
       });
-      localStorage.setItem('gymfy_token', res.access_token);
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.message ?? 'Erro ao cadastrar');
+      }
       router.push('/dashboard');
     } catch (err: any) {
       setErro(err.message ?? 'Erro ao cadastrar');

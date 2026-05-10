@@ -1,7 +1,8 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
-import { api } from '@/lib/api';
+import { useSession } from '@/lib/use-session';
+import { getAlertasChurn } from '@/lib/queries';
 import { cn } from '@/lib/utils';
 
 const riscoLabels: Record<string, { label: string; color: string }> = {
@@ -11,18 +12,19 @@ const riscoLabels: Record<string, { label: string; color: string }> = {
 };
 
 export default function AlertasPage() {
+  const { session } = useSession();
   const [alertas, setAlertas] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filtro, setFiltro] = useState<string>('');
+  const [filtro, setFiltro] = useState('');
 
   useEffect(() => {
-    const token = localStorage.getItem('gymfy_token');
-    if (!token) return;
-    api.alertas.getChurn(token, filtro || undefined)
+    if (!session?.academiaId) return;
+    setLoading(true);
+    getAlertasChurn(session.academiaId, filtro || undefined)
       .then(setAlertas)
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, [filtro]);
+  }, [session, filtro]);
 
   if (loading) return <div className="animate-pulse text-gray-400">Carregando...</div>;
 
@@ -32,14 +34,9 @@ export default function AlertasPage() {
 
       <div className="flex gap-2">
         {['', 'RISCO_MEDIO', 'RISCO_ALTO'].map((r) => (
-          <button
-            key={r}
-            onClick={() => setFiltro(r)}
-            className={cn(
-              'rounded-full px-4 py-1.5 text-sm font-medium transition',
-              filtro === r ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
-            )}
-          >
+          <button key={r} onClick={() => setFiltro(r)}
+            className={cn('rounded-full px-4 py-1.5 text-sm font-medium transition',
+              filtro === r ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200')}>
             {r === '' ? 'Todos' : riscoLabels[r]?.label}
           </button>
         ))}
@@ -58,7 +55,7 @@ export default function AlertasPage() {
           <tbody className="divide-y">
             {alertas.map((alerta) => (
               <tr key={alerta.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 font-medium text-gray-800">{alerta.aluno?.nome}</td>
+                <td className="px-4 py-3 font-medium text-gray-800">{(alerta.aluno as any)?.nome}</td>
                 <td className="px-4 py-3 text-gray-600">{alerta.diasSemCheckin} dias</td>
                 <td className="px-4 py-3">
                   <span className={cn('rounded-full px-2 py-0.5 text-xs font-medium', riscoLabels[alerta.risco]?.color)}>
@@ -66,9 +63,7 @@ export default function AlertasPage() {
                   </span>
                 </td>
                 <td className="px-4 py-3">
-                  <button className="text-green-600 hover:underline text-sm font-medium">
-                    Enviar mensagem
-                  </button>
+                  <button className="text-green-600 hover:underline text-sm font-medium">Enviar mensagem</button>
                 </td>
               </tr>
             ))}

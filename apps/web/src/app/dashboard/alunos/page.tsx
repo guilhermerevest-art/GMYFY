@@ -1,27 +1,27 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
-import { api } from '@/lib/api';
+import { useSession } from '@/lib/use-session';
+import { getAlunos } from '@/lib/queries';
 import { formatDate } from '@/lib/utils';
 
 export default function AlunosPage() {
+  const { session } = useSession();
   const [alunos, setAlunos] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [busca, setBusca] = useState('');
 
   useEffect(() => {
-    const token = localStorage.getItem('gymfy_token');
-    if (!token) return;
-    const payload = JSON.parse(atob(token.split('.')[1]!));
-    api.academias.getAlunos(payload.academiaId, token)
+    if (!session?.academiaId) return;
+    getAlunos(session.academiaId)
       .then(setAlunos)
       .catch(console.error)
       .finally(() => setLoading(false));
-  }, []);
+  }, [session]);
 
   const filtrados = alunos.filter((a) =>
-    a.aluno?.nome?.toLowerCase().includes(busca.toLowerCase()) ||
-    a.aluno?.email?.toLowerCase().includes(busca.toLowerCase())
+    (a.aluno as any)?.nome?.toLowerCase().includes(busca.toLowerCase()) ||
+    (a.aluno as any)?.email?.toLowerCase().includes(busca.toLowerCase())
   );
 
   if (loading) return <div className="animate-pulse text-gray-400">Carregando...</div>;
@@ -33,13 +33,9 @@ export default function AlunosPage() {
         <span className="text-sm text-gray-500">{alunos.length} alunos ativos</span>
       </div>
 
-      <input
-        type="text"
-        placeholder="Buscar por nome ou e-mail..."
-        value={busca}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setBusca(e.target.value)}
-        className="w-full max-w-md rounded-md border border-gray-300 px-4 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
-      />
+      <input type="text" placeholder="Buscar por nome ou e-mail..." value={busca}
+        onChange={(e) => setBusca(e.target.value)}
+        className="w-full max-w-md rounded-md border border-gray-300 px-4 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500" />
 
       <div className="rounded-xl bg-white shadow-sm border overflow-hidden">
         <table className="w-full text-sm">
@@ -52,9 +48,9 @@ export default function AlunosPage() {
           </thead>
           <tbody className="divide-y">
             {filtrados.map((item) => (
-              <tr key={item.aluno?.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 font-medium text-gray-800">{item.aluno?.nome}</td>
-                <td className="px-4 py-3 text-gray-600">{item.aluno?.email}</td>
+              <tr key={(item.aluno as any)?.id} className="hover:bg-gray-50">
+                <td className="px-4 py-3 font-medium text-gray-800">{(item.aluno as any)?.nome}</td>
+                <td className="px-4 py-3 text-gray-600">{(item.aluno as any)?.email}</td>
                 <td className="px-4 py-3 text-gray-500">{formatDate(item.criadoEm)}</td>
               </tr>
             ))}
