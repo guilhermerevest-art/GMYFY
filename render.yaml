@@ -3,7 +3,7 @@ services:
     name: gymfy-api
     runtime: node
     rootDir: apps/api
-    buildCommand: cd ../.. && pnpm install && pnpm --filter @gymfy/shared build && pnpm --filter api prisma:generate && pnpm --filter api build
+    buildCommand: cd ../.. && pnpm install && pnpm --filter @gymfy/shared build && pnpm --filter api build
     startCommand: node dist/main.js
     envVars:
       - key: NODE_ENV
